@@ -1,0 +1,11 @@
+langchain
+langchain-groq
+langchain-community
+langgraph
+chromadb
+tavily-python
+trafilatura
+streamlit
+fpdf
+python-dotenv
+pydantic
