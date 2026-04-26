@@ -1,3 +1,5 @@
+"""Web search tool — wraps the Tavily API for keyword-based web search."""
+
 import os
 from typing import List, Dict, Any
 from tavily import TavilyClient

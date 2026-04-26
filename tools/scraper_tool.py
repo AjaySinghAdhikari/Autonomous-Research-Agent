@@ -1,3 +1,5 @@
+"""Scraper tool — extracts clean article text from a URL using Trafilatura."""
+
 import trafilatura
 from typing import Optional
 

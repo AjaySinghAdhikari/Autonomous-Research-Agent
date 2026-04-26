@@ -1,5 +1,8 @@
+"""LangGraph pipeline — orchestrates the five research agents in sequence."""
+
 import os
 from dotenv import load_dotenv
+
 load_dotenv()
 
 from typing import TypedDict, List, Dict, Any

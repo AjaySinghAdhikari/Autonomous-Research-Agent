@@ -32,7 +32,6 @@ wheels/
 *.egg
 
 # Streamlit
-.streamlit/config.toml
 .streamlit/secrets.toml
 
 # IDEs and OS files
