@@ -21,9 +21,9 @@ if not firebase_admin._apps:
             cred = credentials.Certificate(cred_path)
             firebase_admin.initialize_app(cred)
         except Exception as e:
+            # Keep as warning in case they TRIED to set it up and it failed
             st.warning(f"Failed to initialize Firebase: {e}")
-    else:
-        st.warning("Firebase credentials not found or invalid. Persistence is disabled.")
+    # Removed else block that showed the warning when credentials were missing
 
 def get_db():
     if firebase_admin._apps:
@@ -141,9 +141,9 @@ with st.sidebar:
     else:
         st.info("Run a research topic to see statistics.")
 
-    st.markdown("---")
-    st.title("🕒 Recent Research")
     if db:
+        st.markdown("---")
+        st.title("🕒 Recent Research")
         try:
             recent_sessions = db.collection("sessions").order_by("updated_at", direction=firestore.Query.DESCENDING).limit(5).stream()
             for s in recent_sessions:

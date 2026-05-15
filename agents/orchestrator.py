@@ -7,7 +7,7 @@ from pydantic import BaseModel, Field
 from dotenv import load_dotenv
 load_dotenv()
 
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import JsonOutputParser, StrOutputParser
 
@@ -26,8 +26,7 @@ class KnowledgeGraph(BaseModel):
 # --- Core Functions ---
 
 def decompose_goal(goal: str) -> List[str]:
-    """Uses Gemini Flash to break goal into 3-5 focused, non-overlapping sub-topics."""
-    llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash", temperature=0.2)
+    llm = ChatGroq(model="llama-3.3-70b-versatile", temperature=0.2)
     parser = JsonOutputParser(pydantic_object=SubTopicsList)
     
     prompt = ChatPromptTemplate.from_messages([
@@ -71,8 +70,8 @@ async def run_parallel_research(sub_topics: List[str]) -> Dict[str, Any]:
     return individual_reports
 
 def synthesize_reports(goal: str, individual_reports: Dict[str, Any]) -> str:
-    """Uses Gemini 2.5 Pro with ALL reports in context to write a master synthesis."""
-    llm = ChatGoogleGenerativeAI(model="gemini-2.5-pro", temperature=0.3, max_output_tokens=8192)
+    """Uses Groq with ALL reports in context to write a master synthesis."""
+    llm = ChatGroq(model="llama-3.3-70b-versatile", temperature=0.3)
     
     combined_context = ""
     for idx, (topic, state) in enumerate(individual_reports.items()):
@@ -97,7 +96,7 @@ Requirements:
 
 def extract_knowledge_graph(reports: Dict[str, Any]) -> Dict[str, Any]:
     """Uses Gemini to extract entities and relationships."""
-    llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash", temperature=0.1)
+    llm = ChatGroq(model="llama-3.3-70b-versatile", temperature=0.1)
     parser = JsonOutputParser(pydantic_object=KnowledgeGraph)
     
     combined_context = ""
@@ -111,8 +110,8 @@ def extract_knowledge_graph(reports: Dict[str, Any]) -> Dict[str, Any]:
     
     chain = prompt | llm | parser
     try:
-        # The 1M token context of Flash can handle massive combined strings easily
-        kg = chain.invoke({"context": combined_context[:50000]})  # Cap at 50k chars just in case
+        # Groq context is smaller, but 30k chars is safe for synthesis
+        kg = chain.invoke({"context": combined_context[:30000]})  # Cap at 30k chars
         return kg
     except Exception as e:
         print(f"Error extracting KG: {e}")

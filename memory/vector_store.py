@@ -2,18 +2,14 @@ import os
 import uuid
 import chromadb
 from typing import List, Dict, Any, Optional
-import google.generativeai as genai
+from langchain_huggingface import HuggingFaceEmbeddings
 
-# Configure GenAI
-genai.configure(api_key=os.environ.get("GOOGLE_API_KEY", ""))
+# Use a lightweight local embedding model
+embeddings_model = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
 
-def embed(texts: list[str], task_type: str = "RETRIEVAL_DOCUMENT") -> list[list[float]]:
-    result = genai.embed_content(
-        model="models/text-embedding-004",
-        content=texts,
-        task_type=task_type
-    )
-    return result["embedding"]
+def embed(texts: list[str]) -> list[list[float]]:
+    """Generate embeddings using local HuggingFace model."""
+    return embeddings_model.embed_documents(texts)
 
 class VectorStore:
     def __init__(self, persist_directory: str = "./chroma_db"):
@@ -32,7 +28,7 @@ class VectorStore:
             
         try:
             # Generate embeddings
-            embeddings = embed(documents, task_type="RETRIEVAL_DOCUMENT")
+            embeddings = embed(documents)
             
             self.collection.add(
                 documents=documents,
@@ -46,7 +42,7 @@ class VectorStore:
     def query_similar_content(self, query: str, n_results: int = 3) -> Dict[str, Any]:
         """Query for similar content to avoid duplicates."""
         try:
-            query_embedding = embed([query], task_type="RETRIEVAL_QUERY")
+            query_embedding = embed([query])
             results = self.collection.query(
                 query_embeddings=query_embedding,
                 n_results=n_results
@@ -93,7 +89,7 @@ class VectorStore:
         and returns the top-n chunks with their source URLs, deduplicated by URL.
         """
         try:
-            query_embedding = embed([topic], task_type="RETRIEVAL_QUERY")
+            query_embedding = embed([topic])
             results = self.collection.query(
                 query_embeddings=query_embedding,
                 n_results=n_results

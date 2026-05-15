@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from typing import List, Dict, Any, Optional
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser, JsonOutputParser
 from pydantic import BaseModel, Field
@@ -57,9 +57,8 @@ def write_report(
     if sub_questions is None:
         sub_questions = []
         
-    llm_fast = ChatGoogleGenerativeAI(model="gemini-2.0-flash", temperature=0.2)
-    # 1. Replace with Gemini 2.5 Pro for deep synthesis
-    llm_pro = ChatGoogleGenerativeAI(model="gemini-2.5-pro", temperature=0.3, max_output_tokens=8192)
+    llm_fast = ChatGroq(model="llama-3.3-70b-versatile", temperature=0.2)
+    llm_pro = ChatGroq(model="llama-3.3-70b-versatile", temperature=0.3)
     
     # Build context from retrieved chunks
     url_chunks = {}
@@ -83,7 +82,7 @@ def write_report(
         chunk_text = "\n...\n".join(chunks)
         formatted_entry = f"[{idx}] ({url})\n{chunk_text}\n\n"
         
-        if len(findings_text) + len(formatted_entry) > 80000:
+        if len(findings_text) + len(formatted_entry) > 30000: # Groq context limit adjustment
             break
             
         findings_text += formatted_entry
@@ -112,7 +111,7 @@ def write_report(
         outline_dict = outline_chain.invoke({
             "topic": topic,
             "sub_questions": ", ".join(sub_questions),
-            "findings": findings_text[:15000], 
+            "findings": findings_text[:10000], 
             "contradictions": contradictions_text
         })
     except Exception as e:
@@ -143,7 +142,7 @@ Requirements:
     raw_report = report_chain.invoke({
         "outline": str(outline_dict),
         "topic": topic,
-        "findings": findings_text,
+        "findings": findings_text[:20000], 
         "contradictions": contradictions_text
     })
     

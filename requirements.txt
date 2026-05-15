@@ -9,7 +9,8 @@ streamlit
 fpdf
 python-dotenv
 pydantic
-langchain-google-genai
+sentence-transformers
+langchain-huggingface
 firebase-admin
 google-api-python-client
 google-auth

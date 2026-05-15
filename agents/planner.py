@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from typing import Dict, Any
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import JsonOutputParser
 from pydantic import BaseModel, Field
@@ -17,9 +17,9 @@ class PlannerOutput(BaseModel):
 def plan_research(topic: str) -> Dict[str, Any]:
     """
     Takes a research topic, returns a dynamically sized list of sub-questions,
-    research strategy, complexity score, and estimated sources needed using Gemini 2.0 Flash.
+    research strategy, complexity score, and estimated sources needed using Groq.
     """
-    llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash", temperature=0.2)
+    llm = ChatGroq(model="llama-3.3-70b-versatile", temperature=0.2)
     parser = JsonOutputParser(pydantic_object=PlannerOutput)
     
     prompt = ChatPromptTemplate.from_messages([
