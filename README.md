@@ -1,7 +1,6 @@
 # 🤖 Autonomous Research Agent
 
-> A 5-agent AI pipeline that autonomously plans, searches, reads, critiques,
-> and synthesizes research reports from live web sources.
+
 
 ## 🚀 What It Does
 
