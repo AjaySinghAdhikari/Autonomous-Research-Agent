@@ -55,3 +55,4 @@ Then open `.env` and fill in:
 ```bash
 streamlit run app/streamlit_app.py
 ```
+That's how you can generate a well researched report.
